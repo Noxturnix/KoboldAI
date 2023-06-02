@@ -53,10 +53,16 @@ function launch
         echo Initialization complete...
         exit 0
     else
-    cd /content/KoboldAI-Client
-    echo "Launching KoboldAI with the following options : python3 aiserver.py$model$kmpath$configname$ngrok$localtunnel$savemodel$revision --colab"
-    python3 aiserver.py$model$kmpath$configname$ngrok$localtunnel$savemodel$revision --colab
-    exit
+        cd /content/KoboldAI-Client
+        if [ -z ${gptq+x} ]; then
+            echo "Launching KoboldAI with the following options : python3 aiserver.py$model$kmpath$configname$ngrok$localtunnel$savemodel$revision --colab"
+            python3 aiserver.py$model$kmpath$configname$ngrok$localtunnel$savemodel$revision --colab
+        else
+            cd /content/KoboldAI-Client
+            echo "Launching KoboldAI with the following options : ./play.sh$ngrok$localtunnel --remote --override_rename --override_delete --nobreakmodel --quiet --lowmem"
+            ./play.sh$ngrok$localtunnel --remote --override_rename --override_delete --nobreakmodel --quiet --lowmem
+        fi
+        exit
     fi
 }
 
@@ -115,11 +121,12 @@ if [ "$init" != "skip" ]; then
         if [ "$git" == "Official" ]; then
             git=https://github.com/koboldai/KoboldAI-Client
         fi
-        if [ "$git" == "United" ]; then
+        if [[ "$git" == "United" || "$git" == "united" ]]; then
             git=https://github.com/henk717/KoboldAI-Client
         fi
-        if [ "$git" == "united" ]; then
-            git=https://github.com/henk717/KoboldAI-Client
+        if [[ "$git" == "GPTQ" || "$git" == "gptq" ]]; then
+            git=https://github.com/Noxturnix/KoboldAI
+            gptq=1
         fi
     else
         git=https://github.com/koboldai/KoboldAI-Client
@@ -171,10 +178,12 @@ if [ "$init" != "skip" ]; then
     ln -s /content/drive/MyDrive/KoboldAI/presets/ presets
     ln -s /content/drive/MyDrive/KoboldAI/themes/ themes
 
-    if [ -n "${COLAB_TPU_ADDR+set}" ]; then
-        pip install -r requirements_mtj.txt
-    else
-        pip install -r requirements.txt
+    if [ -z ${gptq+x} ]; then
+        if [ -n "${COLAB_TPU_ADDR+set}" ]; then
+            pip install -r requirements_mtj.txt
+        else
+            pip install -r requirements.txt
+        fi
     fi
     
     # Make sure Colab has the system dependencies
