@@ -1,4 +1,4 @@
-## This is a fork of 0cc4m's KoboldAI for colab.
+## This is a fork of 0cc4m's KoboldAI for colab
 
 [Colab link](https://colab.research.google.com/github/Noxturnix/KoboldAI/blob/main/colab/GPU.ipynb)
 
